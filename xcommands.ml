@@ -27,17 +27,17 @@ type info = [
 ]
 
 type cmd_error = [
-| `ERR_MALFORMED_ACTION (* The responding JID does not understand 
+| `ERR_MALFORMED_ACTION (* The responding JID does not understand
 			                     the specified action. *)
 | `ERR_BAD_ACTION       (* The responding JID cannot accept the
 			                     specified action. *)
 | `ERR_BAD_LOCALE       (* The responding JID cannot accept the
 			                     specified language/locale. *)
-| `ERR_BAD_PAYLOAD     (* The responding JID cannot accept the 
+| `ERR_BAD_PAYLOAD     (* The responding JID cannot accept the
 			                    specified payload (e.g. the data form
 			                    did not provide one or more required
 			                    fields). *)
-| `ERR_BAD_SESSION     (* The responding JID cannot accept the 
+| `ERR_BAD_SESSION     (* The responding JID cannot accept the
 			                    specified sessionid. *)
 | `ERR_SESSION_EXPIRED (* The requesting JID specified a
 			                    sessionid that is no longer active
@@ -45,16 +45,16 @@ type cmd_error = [
 			                    xcanceled, or timed out). *)
 | `ERR_FORBIDDEN       (* The requesting JID is not allowed to
 			                    execute the command. *)
-| `ERR_ITEM_NOT_FOUND  (* The responding JID cannot find the  
+| `ERR_ITEM_NOT_FOUND  (* The responding JID cannot find the
 			                    requested command node. *)
-| `ERR_FEATURE_NOT_IMPLEMENTED (* The responding JID does not support 
+| `ERR_FEATURE_NOT_IMPLEMENTED (* The responding JID does not support
 				                          "http://jabber.org/protocol/commands" *)
 ]
 
 let new_sessionid from to_ node =
   node ^ ":" ^ string_of_float (Unix.gettimeofday ())
 
-let make_command_reply xml ?sessionid ?(lang:string option) 
+let make_command_reply xml ?sessionid ?(lang:string option)
     node ?status ?note subels =
   let a1 = ["xmlns", "http://jabber.org/protocol/commands";
 		        "node", node] in
@@ -84,7 +84,7 @@ let make_command_reply xml ?sessionid ?(lang:string option)
     match xml with
 	    | Xmlelement (_, attrs, _) ->
 	        let newattrs = make_attrs_reply ?lang ~type_:"result" attrs in
-		        Xmlelement ("iq", newattrs, 
+		        Xmlelement ("iq", newattrs,
 			                  [Xmlelement ("command", a3, subels)])
 
 	    | _ -> raise NonXmlelement
@@ -94,19 +94,19 @@ let make_command_error xml ?text error =
     let attr = ["xmlns", "http://jabber.org/protocol/command"] in
 	    match error with
 	      | `ERR_MALFORMED_ACTION ->
-		        `ERR_BAD_REQUEST, 
+		        `ERR_BAD_REQUEST,
 		        Some (Xmlelement ("cmd:malformed-action", attr, []))
 	      | `ERR_BAD_ACTION ->
-		        `ERR_BAD_REQUEST, 
+		        `ERR_BAD_REQUEST,
 		        Some (Xmlelement ("cmd:bad-action", attr, []))
 	      | `ERR_BAD_PAYLOAD ->
-		        `ERR_BAD_REQUEST, 
+		        `ERR_BAD_REQUEST,
 		        Some (Xmlelement ("cmd:bad-payload", attr, []))
 	      | `ERR_BAD_SESSIONID ->
-		        `ERR_BAD_REQUEST, 
+		        `ERR_BAD_REQUEST,
 		        Some (Xmlelement ("cmd:bad-sessionid", attr, []))
 	      | `ERR_SESSION_EXPIRED ->
-		        `ERR_NOT_ALLOWED, 
+		        `ERR_NOT_ALLOWED,
 		        Some (Xmlelement ("cmd:session-expired", attr, []))
 	      | `ERR_FORBIDDEN ->
 		        `ERR_FORBIDDEN, None
@@ -114,16 +114,16 @@ let make_command_error xml ?text error =
 		        `ERR_ITEM_NOT_FOUND, None
 	      | `ERR_FEATURE_NOT_IMPLEMENTED ->
 		        `ERR_FEATURE_NOT_IMPLEMENTED, None
-		          
+
   in
     make_error_reply xml ?text ?specific_cond xmpp_error
 
 let command_info xml =
-  let command = get_by_xmlns xml ~tag:"command" 
+  let command = get_by_xmlns xml ~tag:"command"
     "http://jabber.org/protocol/commands" in
   let node = safe_get_attr_s command "node" in
   let sessionid = safe_get_attr_s command "sessionid" in
-  let action = 
+  let action =
     let a = safe_get_attr_s command "action" in
 	    match a with
 	      | "execute" -> `Execute

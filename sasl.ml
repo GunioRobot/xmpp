@@ -2,7 +2,7 @@
  * (c) 2004-2011 Anastasia Gornostaeva. <ermine@ermine.pp.ru>
  *
  * RFC 2831 Digest SASL Mechanism
- * 
+ *
  *)
 
 exception Error of string
@@ -11,7 +11,7 @@ exception Failure of string
 type t =
   | Token of string
   | Separator of char
-      
+
 let separators = ['('; ')'; '<'; '>'; '@';
                   ','; ';'; ':'; '\\'; '"';
                   '/'; '['; ']'; '?'; '=';
@@ -23,7 +23,7 @@ let is_ctl ch =
     | '\000'..'\031' -> true
     | '\127' -> true
     | _ -> false
-  
+
 let make_lexer =
   let buf = Buffer.create 100 in
   let rec tokenizer strm =
@@ -84,7 +84,7 @@ let make_lexer =
             Some (Token str)
   in
     fun strm -> Stream.from (fun _ -> tokenizer strm)
-            
+
 let get_pairs str =
   let rec scan acc = parser
   | [< 'Token t1; 'Separator '='; 'Token t2; rest >] ->
@@ -99,7 +99,7 @@ and check_comma acc = parser
     try
       scan [] strm
     with _ -> raise (Error "Malformed SASL challenge")
-        
+
 let parse_qop str =
   let rec qop acc = parser
     | [< 'Token t; rest >] ->
@@ -120,7 +120,7 @@ let parse_qop str =
 
 let h s = Cryptokit.hash_string (Cryptokit.Hash.md5 ()) s
 let hex s = Cryptokit.transform_string (Cryptokit.Hexa.encode ()) s
-  
+
 let response_value ~username ~realm ~nonce ~cnonce ~qop ~nc ~digest_uri ~passwd =
   let a1 =
     (h (username ^ ":" ^ realm ^ ":" ^ passwd)) ^ ":" ^ nonce ^ ":" ^ cnonce

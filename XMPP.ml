@@ -6,7 +6,7 @@ open Xml
 open Xmlstream
 open StanzaError
 open JID
-open Transport  
+open Transport
 
 exception Error of string
 exception StreamError of StreamError.t
@@ -47,11 +47,11 @@ let ns_xmpp_session = Some "urn:ietf:params:xml:ns:xmpp-session"
 type iq_request =
   | IQSet of element
   | IQGet of element
-        
+
 type iq_response =
   | IQResult of element option
   | IQError of StanzaError.t
-        
+
 type iq =
   | IQRequest of iq_request
   | IQResponse of iq_response
@@ -91,7 +91,7 @@ let make_stanza_attrs ?id ?jid_from ?jid_to ?kind ?lang () =
 let make_stanza_attrs_reply ?lang ?kind attrs =
   let jid_to = safe_get_attr_value "to" attrs
   and jid_from = safe_get_attr_value "from" attrs
-  and id = safe_get_attr_value "id" attrs 
+  and id = safe_get_attr_value "id" attrs
   and kind = (
     match kind with
       | None -> safe_get_attr_value "type" attrs
@@ -127,7 +127,7 @@ let parse_stanza_attrs attrs =
                     else
                       (id, from, to_, kind, lang)
                  ) (None, None, None, None, None) attrs
-      
+
 let make_iq_request t ?jid_from ?jid_to ?lang request callback =
   t.sid <- t.sid + 1;
   let id = string_of_int t.sid ^ ":" ^ string_of_int (Random.int 1000) in
@@ -142,7 +142,7 @@ let make_iq_request t ?jid_from ?jid_to ?lang request callback =
     t.iq_response <- IDCallback.add t.iq_response id callback 1;
     t.socket.send (Xmlstream.stanza_serialize t.p
                      (make_element (ns_client, "iq") attrs [el]))
-      
+
 type 'a stanza = {
   id : id option;
   jid_from : JID.t option;
@@ -170,7 +170,7 @@ let string_of_message_type = function
   | Chat -> "chat"
   | Groupchat -> "groupchat"
   | Headline -> "headline"
-    
+
 type message_stanza = message_content stanza
 
 let parse_message ~callback ~callback_error t _qname attrs els =
@@ -180,7 +180,7 @@ let parse_message ~callback ~callback_error t _qname attrs els =
       let err = StanzaError.parse_error
         (get_element (ns_client, "error") els) in
         callback_error t ?id ?jid_from ?jid_to ?lang err
-    else      
+    else
       let kind =
         match kind with
           | Some v -> (
@@ -225,7 +225,7 @@ let parse_message ~callback ~callback_error t _qname attrs els =
       }
       in
         callback t message_stanza
-      
+
 let send_message t ?id ?jid_from ?jid_to ?kind ?lang
     ?body ?subject ?thread ?(x=[]) () =
   let jid_to = maybe string_of_jid jid_to in
@@ -242,7 +242,7 @@ let send_message t ?id ?jid_from ?jid_to ?kind ?lang
                                 "thread", thread] in
     t.socket.send (Xmlstream.stanza_serialize t.p
                      (make_element (ns_client, "message") attrs els))
-    
+
 type presence_type =
   | Probe
   | Subscribe
@@ -270,7 +270,7 @@ let string_of_show = function
   | ShowAway -> "away"
   | ShowDND -> "dnd"
   | ShowXA -> "xa"
-      
+
 type presence_content = {
   presence_type : presence_type option;
   show : presence_show option;
@@ -287,7 +287,7 @@ let parse_presence ~callback ~callback_error t _qname attrs els =
       let err = StanzaError.parse_error
         (get_element (ns_client, "error") els) in
         callback_error t ?id ?jid_from ?jid_to ?lang err
-    else      
+    else
       let kind =
         match kind with
           | None -> None
@@ -346,7 +346,7 @@ let parse_presence ~callback ~callback_error t _qname attrs els =
       }
       in
         callback t presence_stanza
-      
+
 let send_presence t ?id ?jid_from ?jid_to ?kind ?lang
     ?show ?status ?priority ?(x=[]) () =
   let jid_to = maybe string_of_jid jid_to in
@@ -364,14 +364,14 @@ let send_presence t ?id ?jid_from ?jid_to ?kind ?lang
        "priority", (maybe string_of_int priority)] in
     t.socket.send (Xmlstream.stanza_serialize t.p
                      (make_element (ns_client, "presence") attrs els))
-      
+
 let send_error_reply t condition ?text ?lang qname attrs els =
   let ns = get_namespace qname in
   let error = make_error ~ns ?text ?lang condition in
   let newattrs = make_stanza_attrs_reply ~kind:"error" attrs in
     t.socket.send (Xmlstream.stanza_serialize t.p
                      (make_element qname newattrs (error::els)))
-      
+
 let register_iq_request_handler t namespace handler =
   t.iq_request <- IQRequestCallback.add namespace handler t.iq_request
 
@@ -383,7 +383,7 @@ let register_stanza_handler t qname handler =
 
 let unregister_stanza_handler t qname =
   t.stanza_handlers <- StanzaHandler.remove qname t.stanza_handlers
-    
+
 let process_iq t _qname attrs els =
   let id, jid_from, jid_to, kind, lang = parse_stanza_attrs attrs in
   let event =
@@ -439,14 +439,14 @@ let process_iq t _qname attrs els =
           match id with
             | None ->
                 raise BadRequest
-            | Some id -> 
+            | Some id ->
                 try
                   let (f, _) = IDCallback.find t.iq_response id in
                     t.iq_response <- IDCallback.delete t.iq_response id;
                     f ev jid_from jid_to lang ()
                 with Not_found -> ()
         )
-          
+
 let make_session t session =
   make_iq_request t ~jid_from:t.myjid
     (IQSet (make_element (ns_xmpp_session, "session") [] []))
@@ -471,7 +471,7 @@ let make_bind t session =
          | IQError _ ->
              raise (Error "bind")
     )
-          
+
 exception AuthError of string
 exception AuthFailure of string
 
@@ -515,9 +515,9 @@ let sasl_digest t password nextstep =
     t.socket.send (Xmlstream.stanza_serialize t.p
                      (make_element (ns_xmpp_sasl, "auth")
                         [make_attr "mechanism" "DIGEST-MD5"] []))
-      
+
 let sasl_plain t password nextstep =
-  let sasl_data = 
+  let sasl_data =
     Cryptokit.transform_string (Cryptokit.Base64.encode_compact  ())
 	    (Printf.sprintf "%s\x00%s\x00%s"
 	       (t.myjid.node ^ "@" ^ t.myjid.domain)
@@ -533,7 +533,7 @@ let sasl_plain t password nextstep =
 		           nextstep t
            | _ ->
                raise (AuthError "Invalid XMPProtocol")
-      );        
+      );
     t.socket.send (Xmlstream.stanza_serialize t.p
                      (make_element (ns_xmpp_sasl, "auth")
                         [make_attr "mechanism" "PLAIN"] [Xmlcdata sasl_data]))
@@ -556,14 +556,14 @@ let sasl_auth t features password  session =
       );
     t.socket.send (Xmlstream.stream_header t.p (ns_streams, "stream")
                      [make_attr "to" t.myjid.domain; make_attr "version" "1.0"])
-  in    
+  in
     if List.mem "DIGEST-MD5" m then
       sasl_digest t password nextstep
     else if List.mem "PLAIN" m then
       sasl_plain t password nextstep
     else
       raise (AuthError "no known SASL method")
-        
+
 let create data socket ?(lang="") myjid =
   let p = Xmlstream.create [ns_streams; ns_client] in
   let () = Xmlstream.bind_prefix p "stream" ns_streams in
@@ -635,7 +635,7 @@ let open_stream t ?(use_tls=false) password session =
                         (make_attr "version" "1.0") ::
                         (if t.xmllang = "" then [] else
                            [make_attr ~ns:ns_xml "lang" t.xmllang])))
-      
+
 let close_stream t =
   t.socket.send (Xmlstream.stream_end t.p (ns_streams, "stream"))
 
@@ -672,4 +672,4 @@ let parse t =
   let str = t.socket.read () in
     Xmlstream.add_buffer t.p str;
     Xmlstream.parse t.p stream_start (stanza t) stream_end
-      
+

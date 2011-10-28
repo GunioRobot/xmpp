@@ -3,7 +3,7 @@
  *)
 
 exception InvalidJID
- 
+
 type t = {
   node: string;
   lnode: string;
@@ -14,7 +14,7 @@ type t = {
 }
 
 let of_string str =
-  let bare_jid, resource = 
+  let bare_jid, resource =
     try
 	    let r = String.index str '/' in
 	      String.sub str 0 r,
@@ -37,13 +37,13 @@ let of_string str =
 	    domain = domain;
 	    resource = resource;
 	    lnode = Stringprep.nodeprep node;
-	    ldomain = Stringprep.nameprep domain; 
+	    ldomain = Stringprep.nameprep domain;
 	    lresource = Stringprep.resourceprep resource
     }
-      
-let bare_jid jid = 
+
+let bare_jid jid =
   { jid with resource = ""; lresource = "" }
-    
+
 let domain jid =
   { jid with lnode = ""; node = ""; resource = ""; lresource = ""}
 
@@ -55,13 +55,13 @@ let string_of_jid ?(lowercase=true) jid =
   in
   let bare_jid = if node = "" then domain else node ^ "@" ^ domain in
     if resource = "" then bare_jid else bare_jid ^ "/" ^ resource
-        
+
 let tolower = string_of_jid ~lowercase:true
-  
+
 let is_bare jid = jid.lresource = ""
-  
+
 let is_node jid = jid.lnode <> ""
-  
+
 let is_bare_node jid = jid.lnode <> "" && jid.lresource = ""
 
 let is_domain jid = jid.lnode = "" && jid.lresource = ""
@@ -70,7 +70,7 @@ let equal jid1 jid2 =
   jid1.lnode = jid2.lnode &&
   jid1.ldomain = jid2.ldomain &&
   jid1.lresource = jid2.lresource
-  
+
 let compare jid1 jid2 = Pervasives.compare
   (jid1.lnode, jid1.ldomain, jid1.lresource)
   (jid2.lnode, jid2.ldomain, jid2.lresource)
@@ -84,6 +84,6 @@ let make_jid node domain resource =
     resource = resource;
     lresource = Stringprep.resourceprep resource
   }
-  
+
 let replace_resource jid resource =
   {jid with resource = resource; lresource = Stringprep.resourceprep resource}

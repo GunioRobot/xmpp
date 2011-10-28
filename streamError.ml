@@ -33,7 +33,7 @@ type condition =
   | ERR_UNSUPPORTED_VERSION
   | ERR_XML_NOT_WELL_FORMED
   | UNKNOWN_CONDITION of string
-      
+
 let string_of_condition = function
   | ERR_BAD_FORMAT -> "bad-format"
   | ERR_BAD_NAMESPACE_PREFIX -> "bad-namespace-prefix"
@@ -109,7 +109,7 @@ let parse_error els =
                           (cond, text)
                    ) (UNKNOWN_CONDITION "", "") els in
     {err_condition = cond; err_text = text}
-      
+
 let make_error ?text ?lang ?app_condition condition =
   let text_el =
     match text with
@@ -127,4 +127,4 @@ let make_error ?text ?lang ?app_condition condition =
             | None -> text_el
             | Some el -> el :: text_el)
       )
-    
+

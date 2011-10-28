@@ -14,7 +14,7 @@ let ns_muc_user = Some "http://jabber.org/protocol/muc#user"
 let ns_muc_admin = Some "http://jabber.org/protocol/muc#admin"
 let ns_muc_owner = Some "http://jabber.org/protocol/muc#owner"
 let ns_muc_unique = Some "http://jabber.org/protocol/muc#unique"
-  
+
 exception InvalidProtocol
 
 type role =
@@ -32,7 +32,7 @@ type affiliation =
 
 let get_attr_value_option name attrs =
   try Some (get_attr_value name attrs) with Not_found -> None
-              
+
 let get_subcdata_option qname el =
   try let subel = get_subelement qname el in
     Some (get_cdata subel)
@@ -68,10 +68,10 @@ type muc_data = {
   since : int option;
   password : string option
 }
-    
+
 let try_int_of_string i =
   try Some (int_of_string i) with _ -> None
-    
+
 let decode_muc el =
   let password = get_subcdata_option (ns_muc, "password") el in
   let history =
@@ -117,7 +117,7 @@ struct
     affiliation : affiliation option;
     role : role option
   }
-    
+
   type  data = {
     decline : (JID.t option * JID.t option * string option) option;
     destroy : (JID.t option * string option) option;
@@ -126,7 +126,7 @@ struct
     password : string option;
     status : int list
   }
-        
+
   let encode_decline ?jid_from ?jid_to ?reason () =
     make_element (ns_muc_user, "decline")
       (List.fold_left (fun acc (k,v) ->
@@ -145,7 +145,7 @@ struct
     let jid_to = maybe JID.of_string (get_attr_value_option "to" attrs) in
     let reason = get_subcdata_option (ns_muc_user, "reason") el in
       (jid_from, jid_to, reason)
-  
+
   let encode_destroy ?jid ?reason () =
     make_element (ns_muc_user, "destroy")
       (match jid with None -> [] | Some v ->
@@ -159,7 +159,7 @@ struct
       (get_attr_value_option "jid" (get_attrs el)) in
     let reason = get_subcdata_option (ns_muc_user, "reason") el in
       (jid, reason)
-  
+
   let encode_invite ?jid_from ?jid_to ?reason () =
     make_element (ns_muc_user, "invite")
       (List.fold_left (fun acc (k,v) ->
@@ -171,14 +171,14 @@ struct
       (match reason with
          | None -> []
          | Some v -> [make_simple_cdata (ns_muc_user, "reason") v])
-    
+
   let decode_invite el =
     let reason = get_subcdata_option (ns_muc_user, "reason") el in
     let attrs = get_attrs el in
     let jid_from = maybe JID.of_string (get_attr_value_option "from" attrs) in
     let jid_to = maybe JID.of_string (get_attr_value_option "to" attrs) in
       (jid_from, jid_to, reason)
-  
+
   let encode_item ?actor ?reason ?continue ?affiliation ?jid ?nick ?role () =
     make_element (ns_muc_user, "item")
       (List.fold_left (fun acc (k,v) ->
@@ -261,7 +261,7 @@ struct
         affiliation = affiliation;
         role = role
       }
-   
+
   let encode_password password =
     make_simple_cdata (ns_muc_user, "password") password
 
@@ -296,9 +296,9 @@ struct
                 ?role:i.role ()) data.item ::
            maybe encode_password data.password ::
            (List.map (fun code -> Some (encode_status code)) data.status))
-    in         
+    in
       make_element (ns_muc_user, "x") [] els
-        
+
   let decode el =
     let data =
       List.fold_left
@@ -359,14 +359,14 @@ struct
            password = None;
            status = []} (get_children el) in
       data
-             
+
 end
 
 module Admin =
 struct
   let encode items =
     make_element (ns_muc_admin, "query") [] items
-  
+
   let encode_item  ?actor ?reason ?affiliation ?jid ?nick ?role () =
     make_element (ns_muc_user, "item")
       (List.fold_left (fun acc (k,v) ->
@@ -403,7 +403,7 @@ struct
              | None -> None
              | Some v -> Some (make_simple_cdata (ns_muc_user, "reason") v))
          ])
-      
+
   type item = {
     actor : JID.t option;
     reason : string option;
@@ -412,7 +412,7 @@ struct
     affiliation : affiliation option;
     role : role option
   }
-    
+
   let decode_item el =
     let actor =
       try let subel = get_subelement (ns_muc_admin, "actor") el in
@@ -447,7 +447,7 @@ struct
         nick = nick;
         affiliation = affiliation;
         role = role}
-      
+
   let decode el =
     let items = get_subelements (ns_muc_admin, "item") el in
       List.map decode_item items
@@ -479,10 +479,10 @@ struct
     let password = get_subcdata_option (ns_muc_owner, "password") el in
     let reason = get_subcdata_option (ns_muc_owner, "reason") el in
       (jid, password, reason)
-  
+
   let encode_xdata xdata =
     make_element (ns_muc_owner, "query") [] [xdata]
-    
+
   let decode_xdata el =
     let x = get_subelement (XEP_xdata.ns_xdata, "x") el in
       XEP_xdata.decode x
@@ -510,4 +510,4 @@ let enter_room xmpp ?maxchars ?maxstanzas ?seconds ?since ?password ?nick room =
 let leave_room xmpp ?reason ~nick room =
   send_presence xmpp ~jid_to:(replace_resource room nick)
     ~kind:Unavailable ?status:reason ()
-    
+

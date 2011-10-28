@@ -20,8 +20,8 @@ let make_disco_info ~category ~type_ ~name ~features () =
 	            []) ::
     List.map (fun feature -> make_feature_var feature) features
 
-let make_disco_item jid ?node name = 
-  let attr = match node with 
+let make_disco_item jid ?node name =
+  let attr = match node with
     | None ->   [("jid", jid); ("name", name)]
     | Some x -> [("jid", jid); ("node", x); ("name", name)]
   in

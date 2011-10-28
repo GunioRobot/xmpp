@@ -3,7 +3,7 @@
  *)
 
 open Unix
-  
+
 let can_tls = true
 
 type t = {
@@ -19,7 +19,7 @@ let connect s host port =
       (Unix.gethostbyname host).Unix.h_addr_list.(0) in
   let sockaddr = Unix.ADDR_INET (inet_addr, port) in
     Unix.connect s sockaddr
-    
+
 let read s () =
   let string = String.create 8193 in
   let size = Unix.read s string 0 8192 in
@@ -29,7 +29,7 @@ let read s () =
     ) else (
       String.sub string 0 size
     )
-          
+
 let send s string =
   let rec aux_send off =
     let size = Unix.write s string off (String.length string - off) in
@@ -62,12 +62,12 @@ let new_machine fd =
         flush Pervasives.stdout;
       *)
       assert (n <> 1)
-  in      
+  in
   let () = tls_SSL_set_connect_state ssl in
     { ctx = ctx;
       ssl = ssl
     }
-      
+
 let rec tls_read machine () =
   let buf = String.create 9216 in
   let n = tls_SSL_read machine.ssl buf 0 9216 in
@@ -96,7 +96,7 @@ let rec tls_read machine () =
         )
     else (* if n > 0 then *)
           String.sub buf 0 n
-        
+
 let tls_send machine buf =
   let rec aux_send off =
     let n = tls_SSL_write machine.ssl buf off (String.length buf - off) in
@@ -119,7 +119,7 @@ let tls_send machine buf =
           ()
   in
     aux_send 0
-           
+
 let switch socket =
   let tls = new_machine socket.fd in
     socket.send <- tls_send tls;

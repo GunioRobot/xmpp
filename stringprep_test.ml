@@ -19,7 +19,7 @@ let test () =
 
 	    let split str =
 	       let buffer = Buffer.create (String.length str * 3) in
-		  List.iter (fun s -> 
+		  List.iter (fun s ->
 				Utf8.store buffer (int_of_string ("0x" ^ s)))
 		     (Str.split s str);
 		  Buffer.contents buffer
@@ -30,7 +30,7 @@ let test () =
 	    let c3s = split c3 in
 	    let c4s = split c4 in
 	    let c5s = split c5 in
-	       
+
 	       Printf.printf "\n\nLine %d\n%s\n%s\n" !counter c4 c1;
 	       if c4s <> stringprep c1s ||
 		  c4s <> stringprep c2s ||
@@ -39,8 +39,8 @@ let test () =
 		  c4s <> stringprep c5s then begin
 (*
 		     let print ulist =
-			String.concat " " 
-			   (List.map (fun i -> Printf.sprintf "%X" i) 
+			String.concat " "
+			   (List.map (fun i -> Printf.sprintf "%X" i)
 			       (stringprep ulist))
 		     in
 			print_endline line;

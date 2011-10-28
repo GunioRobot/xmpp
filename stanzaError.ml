@@ -3,9 +3,9 @@
  *)
 
 open Xml
-  
+
 exception Error of string
-  
+
 let ns_xmpp_stanzas = Some "urn:ietf:params:xml:ns:xmpp-stanzas"
 
 type error_type =
@@ -121,7 +121,7 @@ let error_type_of_condition = function
   | ERR_UNDEFINED_CONDITION -> Cancel
   | ERR_UNEXPECTED_REQUEST -> Wait
   | UNKNOWN_CONDITION _ -> raise (Error "unknown condition")
-      
+
 type t = {
   err_type: error_type;
   err_condition: condition;
@@ -160,7 +160,7 @@ let parse_error error =
                              err_lang = ""
                            } (get_children error) in
     t
-      
+
 let create_error ?type_ ?text ?lang condition =
   {err_type = (match type_ with
                  | None -> error_type_of_condition condition

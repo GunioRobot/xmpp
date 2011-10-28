@@ -27,7 +27,7 @@ let encode t =
                     ) [] ["name", t.name;
                           "os", t.os;
                           "version", t.version])
-    
+
 let decode el =
   try
     let els = get_children el in

@@ -75,14 +75,14 @@ let utf8_width u =
    else if u <= 0x7ff then 2
    else if u <= 0xffff then 3
    else if u <= 0x10ffff then 4
-   else raise (StringprepError 
+   else raise (StringprepError
 		  ("cannot define width of code " ^ string_of_int u))
 
 let compose ch1 ch2 =
    if lBase <= ch1 && ch1 < lBase + lCount &&
       vBase <= ch2 && ch2 < vBase + vCount then
 	 sBase + ((ch1 - lBase) * vCount + (ch2 - vBase)) * tCount
-   else if sBase <= ch1 && ch1 < sBase + sCount && 
+   else if sBase <= ch1 && ch1 < sBase + sCount &&
       ((ch1 - sBase) mod tCount) = 0
 	 && tBase <= ch2 && ch2 < tBase + tCount then
 	    ch1 + ch2 - tBase
@@ -102,7 +102,7 @@ let compose ch1 ch2 =
 	    else
 	       0
 	 else if info1 <> -1 && info2 <> -1 &&
-	    info1 land compSecondMask = 0 && 
+	    info1 land compSecondMask = 0 &&
 	    info2 land compSecondMask > 0 then
 	    compBothList.(info1).(info2 land compMask)
 	 else
@@ -183,7 +183,7 @@ let next s i =
 		 raise (StringprepError "invalid unicode")
 	      end;
 *)
-              ((n1 land 0x0f) lsl 12) lor ((n2 land 0x3f) 
+              ((n1 land 0x0f) lsl 12) lor ((n2 land 0x3f)
 					   lsl 6) lor (n3 land 0x3f), 3
       | '\237' ->
            let n2 = Char.code s.[i+1] in
@@ -200,13 +200,13 @@ let next s i =
            let n3 = Char.code s.[i+2] in
            let n4 = Char.code s.[i+3] in
 (*
-              if (n2 lsr 6 != 0b10) || (n3 lsr 6 != 0b10) || 
+              if (n2 lsr 6 != 0b10) || (n3 lsr 6 != 0b10) ||
 		 (n4 lsr 6 != 0b10) then begin
 		    print_utf8 s 4;
 		    raise (StringprepError "invalid unicode")
 		 end;
 *)
-	      ((n2 land 0x3f) lsl 12) lor ((n3 land 0x3f) lsl 6) 
+	      ((n2 land 0x3f) lsl 12) lor ((n3 land 0x3f) lsl 6)
 	      lor (n4 land 0x3f), 4
       | '\241'..'\243' as c ->
            let n1 = Char.code c in
@@ -220,7 +220,7 @@ let next s i =
 		 raise (StringprepError "invalid unicode")
 	      end;
 *)
-              ((n1 land 0x07) lsl 18) lor ((n2 land 0x3f) 
+              ((n1 land 0x07) lsl 18) lor ((n2 land 0x3f)
 					   lsl 12) lor
 		 ((n3 land 0x3f) lsl 6) lor (n4 land 0x3f), 4
       | '\244' ->
@@ -228,15 +228,15 @@ let next s i =
            let n3 = Char.code s.[i+2] in
            let n4 = Char.code s.[i+3] in
 (*
-              if (n2 lsr 4 != 0b1000) || (n3 lsr 6 != 0b10) || 
+              if (n2 lsr 4 != 0b1000) || (n3 lsr 6 != 0b10) ||
 		 (n4 lsr 6 != 0b10) then begin
 		    print_utf8 s 4;
 		    raise (StringprepError "invalid unicode");
 		 end;
 *)
-              0x100000 lor ((n2 land 0x3f) lsl 12) lor 
+              0x100000 lor ((n2 land 0x3f) lsl 12) lor
 		 ((n3 land 0x3f) lsl 6) lor (n4 land 0x3f), 4
-      | _ -> 
+      | _ ->
 	   print_utf8 s 4;
 	   raise (StringprepError "invalid unicode")
 
@@ -261,7 +261,7 @@ let store b p =
     Buffer.add_char b (Char.chr (0x80 lor (p land 0x3f)))
   )
   else raise (StringprepError "cannot convert from unicode to utf8")
-   
+
 type t =
    | Nameprep
    | Nodeprep
@@ -295,7 +295,7 @@ let stringprep ?(mode=Nameprep) str =
       if decomposed  = [] then
 	 ""
       else
-	 let composed = composite (canonical_ordering 
+	 let composed = composite (canonical_ordering
 				      (Array.of_list decomposed)) in
 
 	 let prohibit =
@@ -320,7 +320,7 @@ let stringprep ?(mode=Nameprep) str =
 		     let info = getUniCharInfo ruc in
 			if info land prohibit > 0 then begin
 (*
-			   Printf.printf "Prohibit %d %X\n" 
+			   Printf.printf "Prohibit %d %X\n"
 			      ruc ruc;
 *)
 			   raise (StringprepError "prohibited");
@@ -361,7 +361,7 @@ let lowercase str =
       if decomposed  = [] then
 	 ""
       else
-	 let composed = composite (canonical_ordering 
+	 let composed = composite (canonical_ordering
 				      (Array.of_list decomposed)) in
 
 (*
@@ -384,22 +384,22 @@ let lowercase str =
 	 raise (StringprepError "invalid bidi");
 *)
       Buffer.contents buffer
-(***)  
+(***)
 
-let nameprep str = 
-   if str <> "" then 
-      stringprep ~mode:Nameprep str 
-   else 
+let nameprep str =
+   if str <> "" then
+      stringprep ~mode:Nameprep str
+   else
       ""
 
-let nodeprep str = 
-   if str <> "" then 
-      stringprep ~mode:Nodeprep str 
-   else 
+let nodeprep str =
+   if str <> "" then
+      stringprep ~mode:Nodeprep str
+   else
       ""
 
-let resourceprep str = 
-   if str <> "" then 
+let resourceprep str =
+   if str <> "" then
       stringprep ~mode:Resourceprep str
-   else 
+   else
       ""

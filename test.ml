@@ -14,15 +14,15 @@ let message_callback t stanza =
 
 let message_error t ?id ?jid_from ?jid_to ?lang error =
   print_endline ("message error: " ^ error.err_text)
-    
+
 let presence_callback t stanza =
   match stanza.content.presence_type with
     | None -> print_endline "available"
     | Some _ -> print_endline "something"
-  
+
 let presence_error t ?id ?jid_from ?jid_to ?lang error =
   print_endline ("presence error: " ^ error.err_text)
-    
+
 let session t =
   XMPP.register_iq_request_handler t XEP_version.ns_version
     (fun ev _jid_from _jid_to _lang () ->
@@ -64,4 +64,4 @@ let _ =
       loop ()
     in
       loop ()
- 
+

@@ -6,7 +6,7 @@
  *)
 
 open Xml
-  
+
 let ns_vcard = Some "vcard-temp"
 
 type n = {
@@ -16,7 +16,7 @@ type n = {
   prefix : string;
   suffix : string
 }
- 
+
 type image =
   | Binval of string * string
   | Extval of string
@@ -67,7 +67,7 @@ type tel = {
   tel_pref : bool;
   number : string
 }
-    
+
 type email = {
   email_home : bool;
   email_work : bool;
@@ -91,12 +91,12 @@ type org = {
   orgname : string;
   orgunit : string
 }
-    
+
 type sound =
   | Phonetic of string
   | SoundBinval of string
   | SoundExtval of string
-      
+
 type field =
   | Nickname of string
   | Photo of image
@@ -133,8 +133,8 @@ and vcard = {
   n : n;
   fields : field list
 }
-    
-  
+
+
 let encode_n item =
   let els =
     List.fold_left (fun acc (field, value) ->
@@ -337,7 +337,7 @@ let rec encode vcard  =
       ((make_simple_cdata (ns_vcard, "FN") vcard.fn) ::
          (encode_n vcard.n) ::
          (encode_fields vcard.fields))
-    
+
 let decode_categories els =
   List.fold_left (fun acc -> function
                     | Xmlelement (qname, _, els) ->
@@ -348,8 +348,8 @@ let decode_categories els =
                     | Xmlcdata _ ->
                         acc
                  ) [] els
-                        
-                    
+
+
 let decode_n els =
   List.fold_left (fun item -> function
                     | Xmlelement (qname, _, els)
@@ -379,7 +379,7 @@ let decode_n els =
                    } els
 
 let decode_adr els =
-  let item = 
+  let item =
     List.fold_left (fun item -> function
                       | Xmlelement (qname, _, _) when
                           get_namespace qname = ns_vcard -> (
@@ -575,7 +575,7 @@ let decode_tel els =
       None
     else
       Some item
-                              
+
 let decode_email els =
   let item =
     List.fold_left (fun item -> function
@@ -615,7 +615,7 @@ let decode_email els =
       None
     else
       Some item
-      
+
 let decode_image els =
   try
     let binval = get_cdata (get_element (ns_vcard, "BINVAL") els) in
@@ -633,14 +633,14 @@ let decode_geo els =
     let lon = get_cdata (get_element (ns_vcard, "LON") els) in
       Some {lat = lat; lon = lon}
   with Not_found -> None
-    
+
 let decode_org els =
   try
     let orgname = get_cdata (get_element (ns_vcard, "ORGNAME") els) in
     let orgunit = get_cdata (get_element (ns_vcard, "ORGUNIT") els) in
       Some {orgname = orgname; orgunit = orgunit}
   with Not_found -> None
-    
+
 let decode_key els =
   try
     let cred = get_cdata (get_element (ns_vcard, "CRED") els) in
@@ -649,7 +649,7 @@ let decode_key els =
       with Not_found -> "" in
       Some (type_, cred)
   with Not_found -> None
-    
+
 let decode_class els =
   let rec aux_fold = function
     | [] -> None
@@ -668,7 +668,7 @@ let decode_class els =
               aux_fold tail
   in
     aux_fold els
-      
+
 let decode_sound els =
   let rec aux_fold = function
     | [] -> None
@@ -687,7 +687,7 @@ let decode_sound els =
               aux_fold tail
   in
     aux_fold els
-      
+
 
 let rec decode el =
   let (fn, n, fields) =
@@ -778,7 +778,7 @@ let rec decode el =
                                   if text <> "" then
                                     (fn, n, Role text :: fields)
                                   else
-                                    (fn, n, fields)                              
+                                    (fn, n, fields)
                             | "LOGO" -> (
                                 match decode_image els with
                                   | None -> (fn, n, fields)

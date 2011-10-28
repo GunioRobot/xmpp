@@ -48,7 +48,7 @@ let make_x_data_field ?label ?var ?value ?required ?options ?type_ () =
     | Some v -> make_simple_cdata "value" v :: s1 in
   let s3 = match options with
     | None -> s2
-    | Some opts -> 
+    | Some opts ->
 	      s2 @ List.map (function l, v ->
 			                   Xmlelement ("option", [("label", l)],
 					                           [make_simple_cdata "value" v])

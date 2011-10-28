@@ -6,15 +6,15 @@
  *)
 
 open Xml
-  
+
 let ns_stats = Some "http://jabber.org/protocol/stats"
-  
+
 type t = {
   name : string;
   units : string;
   value : string
 }
-    
+
 let encode data =
   make_element (ns_stats, "query") []
     (List.map (fun t ->
@@ -24,7 +24,7 @@ let encode data =
                     make_attr "value" t.value]
                    []
               ) data)
-       
+
 let decode el =
   List.fold_left (fun acc -> function
                     | Xmlelement (qname, attrs, _) ->
@@ -38,7 +38,7 @@ let decode el =
                     | Xmlcdata _ ->
                         acc
                  ) [] (get_children el)
-                        
+
 
 let make_iq_get alist =
   make_element (ns_stats, "query") []

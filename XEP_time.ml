@@ -6,7 +6,7 @@
  *)
 
 open Xml
-  
+
 let ns_time = Some "jabber:iq:time"
 
 type t = {
@@ -26,7 +26,7 @@ let encode t =
         (if t.display = "" then None else
            Some (make_simple_cdata (ns_time, "display") t.display))]
     )
-    
+
 let decode el =
   let els = get_children el in
   let utc =

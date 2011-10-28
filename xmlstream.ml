@@ -7,7 +7,7 @@ open Xml
 open Xml.Serialization
 
 exception XmlError of string
-  
+
 type t = {
   namespaces: (prefix, namespace) Hashtbl.t;
   stack_ns: (qname * (namespace * prefix) list) Stack.t;
@@ -124,7 +124,7 @@ let stanza_serialize p el =
   let out = Buffer.add_string buf in
     aux_serialize [] p.ser out el;
     Buffer.contents buf
-  
+
 let stream_header p qname attrs =
   let buf = Buffer.create 30 in
   let out = Buffer.add_string buf in
@@ -142,7 +142,7 @@ let stream_header p qname attrs =
       );
       out ">";
       Buffer.contents buf
-      
+
 let stream_end p qname =
   let buf = Buffer.create 30 in
   let out = Buffer.add_string buf in
@@ -150,4 +150,4 @@ let stream_end p qname =
     out (string_of_qname p.ser qname);
     out ">";
     Buffer.contents buf
-  
+

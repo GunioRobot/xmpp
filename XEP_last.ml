@@ -13,7 +13,7 @@ type t = {
   seconds : int;    (* required *)
   reason : string   (* optional *)
 }
-  
+
 let encode ?(reason="") seconds =
   make_element (ns_last, "query")
     [make_attr "seconds" (string_of_int seconds)]
